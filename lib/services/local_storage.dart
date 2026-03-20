@@ -11,4 +11,9 @@ class LocalStorage {
 
 
 
-  
+   // Cargar favoritos
+  static Future<List<String>> load() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(key) ?? [];
+  }
+}
