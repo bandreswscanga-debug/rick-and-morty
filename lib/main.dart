@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'screens/explorar_screen.dart';
 import 'screens/favoritos_screen.dart';
-import 'services/favorites_manager.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await FavoritesManager().initialize();
+void main() {
   runApp(const MyApp());
 }
 

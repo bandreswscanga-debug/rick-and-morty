@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Clase que representa un personaje
 class Character {
@@ -21,16 +20,12 @@ class Character {
 /// Servicio singleton para gestionar favoritos globalmente
 class FavoritesManager {
   static final FavoritesManager _instance = FavoritesManager._internal();
-  static const String _storageKey = 'favorite_characters';
 
   factory FavoritesManager() {
     return _instance;
   }
 
   FavoritesManager._internal();
-
-  late SharedPreferences _prefs;
-  bool _initialized = false;
 
   // Lista de todos los personajes disponibles
   final List<Character> _allCharacters = [
@@ -102,16 +97,6 @@ class FavoritesManager {
     
     _prefs = await SharedPreferences.getInstance();
     final savedFavorites = _prefs.getStringList(_storageKey) ?? [];
-    
-    // Cargar favoritos guardados
-    for (final character in _allCharacters) {
-      character.isFavorite = savedFavorites.contains(character.name);
-    }
-    
-    _initialized = true;
-    _notifyChanges();
-  }
-
   /// Obtiene todos los personajes
   List<Character> getAllCharacters() => List.from(_allCharacters);
 
@@ -134,7 +119,6 @@ class FavoritesManager {
 
     if (character.name.isNotEmpty && !character.isFavorite) {
       character.isFavorite = true;
-      _saveFavorites();
       _notifyChanges();
     }
   }
@@ -153,7 +137,6 @@ class FavoritesManager {
 
     if (character.name.isNotEmpty && character.isFavorite) {
       character.isFavorite = false;
-      _saveFavorites();
       _notifyChanges();
     }
   }
@@ -172,7 +155,6 @@ class FavoritesManager {
 
     if (character.name.isNotEmpty) {
       character.isFavorite = !character.isFavorite;
-      _saveFavorites();
       _notifyChanges();
     }
   }
@@ -195,17 +177,5 @@ class FavoritesManager {
   /// Notifica a los listeners sobre cambios
   void _notifyChanges() {
     favoritesChanged.value = List.from(getFavorites());
-  }
-
-  /// Guarda los favoritos en disco
-  void _saveFavorites() {
-    if (!_initialized) return;
-    
-    final favoriteNames = _allCharacters
-        .where((char) => char.isFavorite)
-        .map((char) => char.name)
-        .toList();
-    
-    _prefs.setStringList(_storageKey, favoriteNames);
   }
 }
