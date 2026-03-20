@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/favorites_manager.dart';
 
 class ExplorarScreen extends StatefulWidget {
   const ExplorarScreen({Key? key}) : super(key: key);
@@ -11,6 +12,7 @@ class _ExplorarScreenState extends State<ExplorarScreen>
     with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   late AnimationController _animationController;
+  final FavoritesManager _favoritesManager = FavoritesManager();
 
   final List<Map<String, String>> _characters = [
     {'name': 'Rick Sanchez', 'status': 'Alive', 'species': 'Human', 'emoji': '👨‍🔬'},
@@ -151,6 +153,7 @@ class _ExplorarScreenState extends State<ExplorarScreen>
             status: _filteredCharacters[index]['status']!,
             species: _filteredCharacters[index]['species']!,
             emoji: _filteredCharacters[index]['emoji']!,
+            favoritesManager: _favoritesManager,
           ),
         );
       },
@@ -163,12 +166,14 @@ class _CharacterCard extends StatefulWidget {
   final String status;
   final String species;
   final String emoji;
+  final FavoritesManager favoritesManager;
 
   const _CharacterCard({
     required this.name,
     required this.status,
     required this.species,
     required this.emoji,
+    required this.favoritesManager,
   });
 
   @override
@@ -176,7 +181,27 @@ class _CharacterCard extends StatefulWidget {
 }
 
 class _CharacterCardState extends State<_CharacterCard> {
-  bool _isFavorited = false;
+  late bool _isFavorited;
+
+  @override
+  void initState() {
+    super.initState();
+    _isFavorited = widget.favoritesManager.isFavorite(widget.name);
+    // Escuchar cambios en favoritos
+    widget.favoritesManager.favoritesChanged.addListener(_onFavoritesChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.favoritesManager.favoritesChanged.removeListener(_onFavoritesChanged);
+    super.dispose();
+  }
+
+  void _onFavoritesChanged() {
+    setState(() {
+      _isFavorited = widget.favoritesManager.isFavorite(widget.name);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -259,19 +284,17 @@ class _CharacterCardState extends State<_CharacterCard> {
               color: _isFavorited ? Colors.red : Colors.grey[400],
             ),
             onPressed: () {
-              setState(() {
-                _isFavorited = !_isFavorited;
-              });
+              widget.favoritesManager.toggleFavorite(widget.name);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
                     _isFavorited
-                        ? '${widget.name} añadido a favoritos'
-                        : '${widget.name} removido de favoritos',
+                        ? '${widget.name} removido de favoritos'
+                        : '${widget.name} añadido a favoritos',
                   ),
                   duration: const Duration(milliseconds: 800),
                   behavior: SnackBarBehavior.floating,
-                  backgroundColor: _isFavorited ? Colors.green : Colors.grey[700],
+                  backgroundColor: _isFavorited ? Colors.grey[700] : Colors.green,
                 ),
               );
             },

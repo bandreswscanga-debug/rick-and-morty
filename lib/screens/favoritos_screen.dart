@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/favorites_manager.dart';
 
 class FavoritosScreen extends StatefulWidget {
   const FavoritosScreen({Key? key}) : super(key: key);
@@ -10,21 +11,7 @@ class FavoritosScreen extends StatefulWidget {
 class _FavoritosScreenState extends State<FavoritosScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-
-  final List<Map<String, String>> _favoritos = [
-    {
-      'name': 'Rick Sanchez',
-      'species': 'Human',
-      'status': 'Alive',
-      'emoji': '👨‍🔬'
-    },
-    {
-      'name': 'Morty Smith',
-      'species': 'Human',
-      'status': 'Alive',
-      'emoji': '👦'
-    },
-  ];
+  final FavoritesManager _favoritesManager = FavoritesManager();
 
   @override
   void initState() {
@@ -34,19 +21,30 @@ class _FavoritosScreenState extends State<FavoritosScreen>
       vsync: this,
     );
     _animationController.forward();
+    // Escuchar cambios en favoritos
+    _favoritesManager.favoritesChanged.addListener(_onFavoritesChanged);
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    _favoritesManager.favoritesChanged.removeListener(_onFavoritesChanged);
     super.dispose();
+  }
+
+  void _onFavoritesChanged() {
+    // Reanimar cuando cambien los favoritos
+    _animationController.forward(from: 0.0);
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return _favoritos.isEmpty
+    final favoritos = _favoritesManager.getFavorites();
+    
+    return favoritos.isEmpty
         ? _buildEmptyState()
-        : _buildFavoritosList();
+        : _buildFavoritosList(favoritos);
   }
 
   Widget _buildEmptyState() {
@@ -109,10 +107,10 @@ class _FavoritosScreenState extends State<FavoritosScreen>
     );
   }
 
-  Widget _buildFavoritosList() {
+  Widget _buildFavoritosList(List<Character> favoritos) {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      itemCount: _favoritos.length,
+      itemCount: favoritos.length,
       itemBuilder: (context, index) {
         return SlideTransition(
           position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
@@ -127,39 +125,8 @@ class _FavoritosScreenState extends State<FavoritosScreen>
                 ),
               ),
           child: _FavoritoCard(
-            name: _favoritos[index]['name']!,
-            species: _favoritos[index]['species']!,
-            status: _favoritos[index]['status']!,
-            emoji: _favoritos[index]['emoji']!,
-            onRemove: () {
-              setState(() {
-                _favoritos.removeAt(index);
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${_favoritos[index]['name']} removido de favoritos'),
-                  duration: const Duration(milliseconds: 900),
-                  behavior: SnackBarBehavior.floating,
-                  backgroundColor: Colors.grey[700],
-                  action: SnackBarAction(
-                    label: 'Deshacer',
-                    onPressed: () {
-                      setState(() {
-                        _favoritos.insert(
-                          index,
-                          {
-                            'name': _favoritos[index]['name']!,
-                            'species': _favoritos[index]['species']!,
-                            'status': _favoritos[index]['status']!,
-                            'emoji': _favoritos[index]['emoji']!,
-                          },
-                        );
-                      });
-                    },
-                  ),
-                ),
-              );
-            },
+            character: favoritos[index],
+            favoritesManager: _favoritesManager,
           ),
         );
       },
@@ -168,18 +135,12 @@ class _FavoritosScreenState extends State<FavoritosScreen>
 }
 
 class _FavoritoCard extends StatefulWidget {
-  final String name;
-  final String species;
-  final String status;
-  final String emoji;
-  final VoidCallback onRemove;
+  final Character character;
+  final FavoritesManager favoritesManager;
 
   const _FavoritoCard({
-    required this.name,
-    required this.species,
-    required this.status,
-    required this.emoji,
-    required this.onRemove,
+    required this.character,
+    required this.favoritesManager,
   });
 
   @override
@@ -191,7 +152,7 @@ class _FavoritoCardState extends State<_FavoritoCard> {
 
   @override
   Widget build(BuildContext context) {
-    final isAlive = widget.status == 'Alive';
+    final isAlive = widget.character.status == 'Alive';
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -237,13 +198,13 @@ class _FavoritoCardState extends State<_FavoritoCard> {
                 ),
                 child: Center(
                   child: Text(
-                    widget.emoji,
+                    widget.character.emoji,
                     style: const TextStyle(fontSize: 28),
                   ),
                 ),
               ),
               title: Text(
-                widget.name,
+                widget.character.name,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -265,7 +226,7 @@ class _FavoritoCardState extends State<_FavoritoCard> {
                         border: Border.all(color: Colors.blue[300]!),
                       ),
                       child: Text(
-                        widget.species,
+                        widget.character.species,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.blue[700],
@@ -286,7 +247,7 @@ class _FavoritoCardState extends State<_FavoritoCard> {
                         ),
                       ),
                       child: Text(
-                        widget.status,
+                        widget.character.status,
                         style: TextStyle(
                           fontSize: 12,
                           color: isAlive ? Colors.green[700] : Colors.red[700],
@@ -299,7 +260,23 @@ class _FavoritoCardState extends State<_FavoritoCard> {
               ),
               trailing: IconButton(
                 icon: const Icon(Icons.favorite, color: Colors.red),
-                onPressed: widget.onRemove,
+                onPressed: () {
+                  widget.favoritesManager.removeFavorite(widget.character.name);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${widget.character.name} removido de favoritos'),
+                      duration: const Duration(milliseconds: 900),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.grey[700],
+                      action: SnackBarAction(
+                        label: 'Deshacer',
+                        onPressed: () {
+                          widget.favoritesManager.addFavorite(widget.character.name);
+                        },
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
