@@ -27,7 +27,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
   Win32Window::Size size(1280, 720);
+<<<<<<< HEAD
   if (!window.Create(L"proyectomain", origin, size)) {
+=======
+  if (!window.Create(L"rick_and_morty", origin, size)) {
+>>>>>>> fd579905e5b498069beaa55f09c29e7821875300
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);

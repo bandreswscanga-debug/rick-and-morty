@@ -90,12 +90,21 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
+<<<<<<< HEAD
             VALUE "FileDescription", "proyectomain" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "proyectomain" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.example. All rights reserved." "\0"
             VALUE "OriginalFilename", "proyectomain.exe" "\0"
             VALUE "ProductName", "proyectomain" "\0"
+=======
+            VALUE "FileDescription", "rick_and_morty" "\0"
+            VALUE "FileVersion", VERSION_AS_STRING "\0"
+            VALUE "InternalName", "rick_and_morty" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.example. All rights reserved." "\0"
+            VALUE "OriginalFilename", "rick_and_morty.exe" "\0"
+            VALUE "ProductName", "rick_and_morty" "\0"
+>>>>>>> fd579905e5b498069beaa55f09c29e7821875300
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
