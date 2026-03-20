@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
+<<<<<<< HEAD
+        android:label="proyectomain"
+=======
         android:label="rick_and_morty"
+>>>>>>> fd579905e5b498069beaa55f09c29e7821875300
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

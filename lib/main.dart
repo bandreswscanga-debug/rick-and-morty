@@ -1,4 +1,14 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
+import 'screens/home_screen.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+=======
 import 'screens/explorar_screen.dart';
 import 'screens/favoritos_screen.dart';
 
@@ -8,11 +18,17 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
+>>>>>>> fd579905e5b498069beaa55f09c29e7821875300
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+<<<<<<< HEAD
+      home: HomeScreen(),
+    );
+  }
+=======
       title: 'Rick and Morty',
       theme: ThemeData(
         useMaterial3: true,
@@ -161,4 +177,5 @@ class _NavItem {
     required this.activeIcon,
     required this.label,
   });
+>>>>>>> fd579905e5b498069beaa55f09c29e7821875300
 }

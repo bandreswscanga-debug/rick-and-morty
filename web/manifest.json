@@ -1,6 +1,11 @@
 {
+<<<<<<< HEAD
+    "name": "proyectomain",
+    "short_name": "proyectomain",
+=======
     "name": "rick_and_morty",
     "short_name": "rick_and_morty",
+>>>>>>> fd579905e5b498069beaa55f09c29e7821875300
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

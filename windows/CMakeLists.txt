@@ -1,10 +1,18 @@
 # Project-level configuration.
 cmake_minimum_required(VERSION 3.14)
+<<<<<<< HEAD
+project(proyectomain LANGUAGES CXX)
+
+# The name of the executable created for the application. Change this to change
+# the on-disk name of your application.
+set(BINARY_NAME "proyectomain")
+=======
 project(rick_and_morty LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
 set(BINARY_NAME "rick_and_morty")
+>>>>>>> fd579905e5b498069beaa55f09c29e7821875300
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
